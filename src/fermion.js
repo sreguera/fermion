@@ -1,4 +1,5 @@
 var craft = {x: 0, y: 0, vx: 0, vy: 0, r: 10, engineOn: false};
+var ground = {x: 0, y:0, width:0, height:0}
 var GRAVITY_ACC = 10;
 var ENGINE_ACC = 15;
 var MAX_V = 10;
@@ -14,6 +15,20 @@ var animate = function() {
     craft.y = craft.y + craft.vy * TIME_STEP;
 }
 
+var craftCollide = function() {
+    if (craft.y + craft.r > ground.y - ground.height / 2) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+var drawGround = function(ctx) {
+    ctx.fillRect(ground.x - ground.width / 2,
+                 ground.y - ground.height / 2,
+                 ground.width, ground.height)
+}
+
 var drawCraft = function(ctx) {
     var r = craft.r
     ctx.fillRect(craft.x - r, craft.y - r, 2 * r, 2 * r);
@@ -27,11 +42,20 @@ var drawCraft = function(ctx) {
     }
 }
 
+var drawHud = function(ctx) {
+    var message = "VY: " + craft.vy.toFixed(1);
+    ctx.fillText(message, 10, 10);
+}
+
 var init = function() {
     intervalId = setInterval(draw, TIME_STEP * 1000);
     var canvas = document.getElementById('canvas');
     craft.x = canvas.width / 2;
     craft.y = craft.r;
+    ground.x = canvas.width / 2;
+    ground.y = canvas.height - 10;
+    ground.width = canvas.width;
+    ground.height = 20;
 }
 
 var draw = function() {
@@ -40,9 +64,11 @@ var draw = function() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     animate();
+    drawGround(ctx);
     drawCraft(ctx);
+    drawHud(ctx);
 
-    if (craft.y > canvas.height - craft.r) {
+    if (craftCollide()) {
         clearInterval(intervalId);
         var message;
         if (craft.vy > MAX_V) {
