@@ -1,7 +1,7 @@
 var craft = {x: 0, y: 0, vx: 0, vy: 0, r: 10, fuel:500, engineOn: false};
 var ground = {x: 0, y:0, width:0, height:0}
 var GRAVITY_ACC = 10;
-var ENGINE_ACC = 15;
+var ENGINE_THRUST = 15000;
 var MAX_V = 10;
 var TIME_STEP = 0.025;
 var intervalId;
@@ -9,7 +9,7 @@ var intervalId;
 var animate = function() {
     var ay = GRAVITY_ACC;
     if (craft.engineOn && craft.fuel > 0) {
-        ay = ay - ENGINE_ACC;
+        ay = ay - (ENGINE_THRUST / (500 + craft.fuel));
         craft.fuel = craft.fuel - 1;
     }
     craft.vy = craft.vy + ay * TIME_STEP;
