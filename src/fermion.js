@@ -1,4 +1,4 @@
-var craft = {x: 0, y: 0, vx: 0, vy: 0, r: 10, engineOn: false};
+var craft = {x: 0, y: 0, vx: 0, vy: 0, r: 10, fuel:500, engineOn: false};
 var ground = {x: 0, y:0, width:0, height:0}
 var GRAVITY_ACC = 10;
 var ENGINE_ACC = 15;
@@ -8,8 +8,9 @@ var intervalId;
 
 var animate = function() {
     var ay = GRAVITY_ACC;
-    if (craft.engineOn) {
+    if (craft.engineOn && craft.fuel > 0) {
         ay = ay - ENGINE_ACC;
+        craft.fuel = craft.fuel - 1;
     }
     craft.vy = craft.vy + ay * TIME_STEP;
     craft.y = craft.y + craft.vy * TIME_STEP;
@@ -32,7 +33,7 @@ var drawGround = function(ctx) {
 var drawCraft = function(ctx) {
     var r = craft.r
     ctx.fillRect(craft.x - r, craft.y - r, 2 * r, 2 * r);
-    if (craft.engineOn) {
+    if (craft.engineOn && craft.fuel > 0) {
         ctx.beginPath();
         ctx.moveTo(craft.x,     craft.y + r);
         ctx.lineTo(craft.x - r, craft.y + r + 2 * r);
@@ -45,6 +46,8 @@ var drawCraft = function(ctx) {
 var drawHud = function(ctx) {
     var message = "VY: " + craft.vy.toFixed(1);
     ctx.fillText(message, 10, 10);
+    var fuelMessage = "FUEL: " + craft.fuel;
+    ctx.fillText(fuelMessage, 300, 10);
 }
 
 var init = function() {
