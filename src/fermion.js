@@ -26,6 +26,77 @@ var MAX_VX = 4;
 var TIME_STEP = 0.025;
 var intervalId;
 
+var LEFT_ARROW = 37;
+var RIGHT_ARROW = 39;
+var DOWN_ARROW = 40;
+
+
+var init = function() {
+    enterInitState();
+}
+
+//======================================================================
+// InitState
+//======================================================================
+
+var enterInitState = function() {
+    document.onkeydown = null;
+    document.onkeyup = null;
+    document.onkeypress = onKeyPressInit;
+
+    var canvas = document.getElementById('canvas');
+    var ctx = canvas.getContext('2d');
+
+    // ctx.fillStyle="rgb(255, 255, 255)"
+    // ctx.fillRect(0, 0, canvas.width, canvas.height);
+    drawBackground(ctx);
+    ctx.fillStyle="rgb(20, 20, 20)"
+
+    drawTextCentered("Press SPACE to play");
+}
+
+var onKeyPressInit = function(event) {
+    enterPlayingState();
+}
+
+//======================================================================
+// ResultState
+//======================================================================
+
+var enterResultState = function() {
+    clearInterval(intervalId);
+    document.onkeydown = null;
+    document.onkeyup = null;
+    document.onkeypress = onKeyPressResult;
+}
+
+var onKeyPressResult = function(event) {
+    enterInitState();
+}
+
+//======================================================================
+// PlayingState
+//======================================================================
+
+var enterPlayingState = function() {
+    document.onkeydown = onKeyDown;
+    document.onkeyup = onKeyUp;
+    document.onkeypress = null;
+    intervalId = setInterval(draw, TIME_STEP * 1000);
+    var canvas = document.getElementById('canvas');
+    craft.x = canvas.width / 2;
+    craft.y = craft.r;
+    craft.vx = 0;
+    craft.vy = 0;
+    craft.a = 0;
+    craft.fuel = 500;
+    craft.engineOn = false;
+    ground.x = canvas.width / 2;
+    ground.y = canvas.height - 10;
+    ground.width = canvas.width;
+    ground.height = 20;
+}
+
 var animate = function() {
     var ax = 0;
     var ay = GRAVITY_ACC;
@@ -53,29 +124,69 @@ var craftCollide = function() {
 }
 
 var drawGround = function(ctx) {
+    ctx.fillStyle="rgb(193, 154, 107)"
     ctx.fillRect(ground.x - ground.width / 2,
                  ground.y - ground.height / 2,
                  ground.width, ground.height)
 }
 
 var drawCraft = function(ctx) {
+    ctx.fillStyle="rgb(255, 255, 255)"
     ctx.save();
     ctx.translate(craft.x, craft.y);
     ctx.rotate(craft.a);
     var r = craft.r;
-    ctx.fillRect(-r, -r, 2 * r, 2 * r);
+
+    // Ship
+    ctx.beginPath();
+    ctx.moveTo(-r, 0);
+    ctx.lineTo(0, -r);
+    ctx.lineTo(r, 0);
+    ctx.arc(r/2, 0, r/2, 0, Math.PI/2, false);
+    ctx.lineTo(-r/2, r/2);
+    ctx.arc(-r/2, 0, r/2, Math.PI/2, Math.PI, false);
+    ctx.closePath();
+    ctx.fill();
+
+    // Legs
+    ctx.beginPath();
+    ctx.moveTo(r/2, r/2);
+    ctx.lineTo(r, r);
+    ctx.moveTo(-r/2, r/2);
+    ctx.lineTo(-r, r);
+    ctx.stroke();
+
+
     if (craft.engineOn && craft.fuel > 0) {
+        // Plume
+        ctx.fillStyle="rgb(255, 255, 150)"
         ctx.beginPath();
-        ctx.moveTo(0, r);
-        ctx.lineTo(-r, r + 2 * r);
-        ctx.moveTo(0, r);
-        ctx.lineTo(+r, r + 2 * r);
-        ctx.stroke();
+        ctx.arc(0, 3*r/4, r/4, 0, 2*Math.PI);
+        ctx.moveTo(r/4, 3*r/4);
+        ctx.lineTo(0, 2*r);
+        ctx.lineTo(-r/4, 3*r/4);
+        ctx.fill();
     }
     ctx.restore();
+
+    // ctx.save();
+
+    // ctx.translate(0, 400);
+    // ctx.scale(10, -10);
+    // ctx.fillRect(0, 0, 10, 10);
+
+    // ctx.scale(1, -1);
+    // ctx.translate(0, -400);
+    // ctx.fillRect(0, 0, 100, 100);
+
+    // ctx.scale(10, -10);
+    // ctx.translate(0, -40);
+    // ctx.fillRect(0, 0, 10, 10);
+    // ctx.restore();
 }
 
 var drawHud = function(ctx) {
+    ctx.fillStyle="rgb(0, 0, 0)"
     var vyMessage = "VY: " + craft.vy.toFixed(1);
     ctx.fillText(vyMessage, 10, 10);
     var vxMessage = "VX: " + craft.vx.toFixed(1);
@@ -83,50 +194,32 @@ var drawHud = function(ctx) {
     var degMessage = "DEG: " + ((craft.a * 180) / Math.PI).toFixed(1);
     ctx.fillText(degMessage, 10, 50);
     var fuelMessage = "FUEL: " + craft.fuel;
-    ctx.fillText(fuelMessage, 300, 10);
-}
-
-var init = function() {
-    intervalId = setInterval(draw, TIME_STEP * 1000);
-    var canvas = document.getElementById('canvas');
-    craft.x = canvas.width / 2;
-    craft.y = craft.r;
-    ground.x = canvas.width / 2;
-    ground.y = canvas.height - 10;
-    ground.width = canvas.width;
-    ground.height = 20;
+    ctx.fillText(fuelMessage, 500, 10);
 }
 
 var draw = function() {
     var canvas = document.getElementById('canvas');
     var ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // ctx.fillStyle="rgb(255, 255, 255)"
+    // ctx.fillRect(0, 0, canvas.width, canvas.height);
+    drawBackground(ctx);
 
     animate();
-    drawGround(ctx);
     drawCraft(ctx);
+    drawGround(ctx);
     drawHud(ctx);
 
     if (craftCollide()) {
-        clearInterval(intervalId);
-        var message;
         if (craft.vy > MAX_VY 
             || Math.abs(craft.vx) > MAX_VX
             || (craft.a / (2 * Math.PI)) > 0.1) {
-            message = "CRASH!";
+            drawTextCentered("CRASH!");
         } else {
-            message = "GOOD LANDING!";
+            drawTextCentered("GOOD LANDING!");
         }
-        var textSize = ctx.measureText(message);
-        ctx.fillText(message, 
-                     canvas.width / 2 - textSize.width / 2,
-                     canvas.height / 2);
+        enterResultState();
     }
 }
-
-var LEFT_ARROW = 37;
-var RIGHT_ARROW = 39;
-var DOWN_ARROW = 40;
 
 var onKeyDown = function(event) {
     switch (event.keyCode) {
@@ -162,5 +255,32 @@ var onKeyUp = function(event) {
     }
 }
 
-document.onkeydown = onKeyDown;
-document.onkeyup = onKeyUp;
+//======================================================================
+// Utils
+//======================================================================
+
+var drawTextCentered = function(text) {
+    var canvas = document.getElementById('canvas');
+    var ctx = canvas.getContext('2d');
+    var textSize = ctx.measureText(text);
+    ctx.fillText(text, 
+                 canvas.width / 2 - textSize.width / 2,
+                 canvas.height / 2);
+}
+
+var drawBackground = function(ctx) {
+    var gradient = ctx.createLinearGradient(0, 0, 0, 600);
+    gradient.addColorStop(0, "rgb(0, 127, 255)");
+    gradient.addColorStop(1, "rgb(204, 230, 230)");
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, 600, 400);
+
+    ctx.fillStyle = "rgb(130, 102, 68)";
+    ctx.beginPath();
+    ctx.moveTo(0, 400);
+    ctx.lineTo(0, 350);
+    ctx.lineTo(100, 330);
+    ctx.lineTo(500, 400);
+    ctx.closePath();
+    ctx.fill();
+}
