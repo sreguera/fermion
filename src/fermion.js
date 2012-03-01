@@ -123,68 +123,6 @@ var craftCollide = function() {
     }
 }
 
-var drawGround = function(ctx) {
-    ctx.fillStyle="rgb(193, 154, 107)"
-    ctx.fillRect(ground.x - ground.width / 2,
-                 ground.y - ground.height / 2,
-                 ground.width, ground.height)
-}
-
-var drawCraft = function(ctx) {
-    ctx.fillStyle="rgb(255, 255, 255)"
-    ctx.save();
-    ctx.translate(craft.x, craft.y);
-    ctx.rotate(craft.a);
-    var r = craft.r;
-
-    // Ship
-    ctx.beginPath();
-    ctx.moveTo(-r, 0);
-    ctx.lineTo(0, -r);
-    ctx.lineTo(r, 0);
-    ctx.arc(r/2, 0, r/2, 0, Math.PI/2, false);
-    ctx.lineTo(-r/2, r/2);
-    ctx.arc(-r/2, 0, r/2, Math.PI/2, Math.PI, false);
-    ctx.closePath();
-    ctx.fill();
-
-    // Legs
-    ctx.beginPath();
-    ctx.moveTo(r/2, r/2);
-    ctx.lineTo(r, r);
-    ctx.moveTo(-r/2, r/2);
-    ctx.lineTo(-r, r);
-    ctx.stroke();
-
-
-    if (craft.engineOn && craft.fuel > 0) {
-        // Plume
-        ctx.fillStyle="rgb(255, 255, 150)"
-        ctx.beginPath();
-        ctx.arc(0, 3*r/4, r/4, 0, 2*Math.PI);
-        ctx.moveTo(r/4, 3*r/4);
-        ctx.lineTo(0, 2*r);
-        ctx.lineTo(-r/4, 3*r/4);
-        ctx.fill();
-    }
-    ctx.restore();
-
-    // ctx.save();
-
-    // ctx.translate(0, 400);
-    // ctx.scale(10, -10);
-    // ctx.fillRect(0, 0, 10, 10);
-
-    // ctx.scale(1, -1);
-    // ctx.translate(0, -400);
-    // ctx.fillRect(0, 0, 100, 100);
-
-    // ctx.scale(10, -10);
-    // ctx.translate(0, -40);
-    // ctx.fillRect(0, 0, 10, 10);
-    // ctx.restore();
-}
-
 var drawHud = function(ctx) {
     ctx.fillStyle="rgb(0, 0, 0)"
     var vyMessage = "VY: " + craft.vy.toFixed(1);
@@ -287,4 +225,66 @@ var drawBackground = function(ctx) {
     ctx.lineTo(500, 400);
     ctx.closePath();
     ctx.fill();
+}
+
+var drawGround = function(ctx) {
+    ctx.fillStyle="rgb(193, 154, 107)"
+    ctx.fillRect(ground.x - ground.width / 2,
+                 ground.y - ground.height / 2,
+                 ground.width, ground.height)
+}
+
+var drawCraft = function(ctx) {
+    ctx.fillStyle="rgb(255, 255, 255)"
+    ctx.save();
+    ctx.translate(craft.x, craft.y);
+    ctx.rotate(craft.a);
+    var r = craft.r;
+
+    // Ship
+    ctx.beginPath();
+    ctx.moveTo(-r, 0);
+    ctx.lineTo(0, -r);
+    ctx.lineTo(r, 0);
+    ctx.arc(r/2, 0, r/2, 0, Math.PI/2, false);
+    ctx.lineTo(-r/2, r/2);
+    ctx.arc(-r/2, 0, r/2, Math.PI/2, Math.PI, false);
+    ctx.closePath();
+    ctx.fill();
+
+    // Legs
+    ctx.beginPath();
+    ctx.moveTo(r/2, r/2);
+    ctx.lineTo(r, r);
+    ctx.moveTo(-r/2, r/2);
+    ctx.lineTo(-r, r);
+    ctx.stroke();
+
+
+    if (craft.engineOn && craft.fuel > 0) {
+        // Plume
+        ctx.fillStyle="rgb(255, 255, 150)"
+        ctx.beginPath();
+        ctx.arc(0, 3*r/4, r/4, 0, 2*Math.PI);
+        ctx.moveTo(r/4, 3*r/4);
+        ctx.lineTo(0, 2*r);
+        ctx.lineTo(-r/4, 3*r/4);
+        ctx.fill();
+    }
+    ctx.restore();
+
+    // ctx.save();
+
+    // ctx.translate(0, 400);
+    // ctx.scale(10, -10);
+    // ctx.fillRect(0, 0, 10, 10);
+
+    // ctx.scale(1, -1);
+    // ctx.translate(0, -400);
+    // ctx.fillRect(0, 0, 100, 100);
+
+    // ctx.scale(10, -10);
+    // ctx.translate(0, -40);
+    // ctx.fillRect(0, 0, 10, 10);
+    // ctx.restore();
 }
