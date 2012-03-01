@@ -219,6 +219,10 @@ var draw = function() {
         }
         enterResultState();
     }
+    if (craft.x < 0 || craft.x > 600 || craft.y < 0) {
+        drawTextCentered("OUT OF RANGE");
+        enterResultState();
+    }
 }
 
 var onKeyDown = function(event) {
