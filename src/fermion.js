@@ -14,6 +14,7 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+"use strict";
 var craft = {x: 0, y: 0, vx: 0, vy: 0,
              a: 0, turn: 0, 
              r: 10, 
@@ -47,8 +48,6 @@ var enterInitState = function() {
     var canvas = document.getElementById('canvas');
     var ctx = canvas.getContext('2d');
 
-    // ctx.fillStyle="rgb(255, 255, 255)"
-    // ctx.fillRect(0, 0, canvas.width, canvas.height);
     drawBackground(ctx);
     ctx.fillStyle="rgb(20, 20, 20)"
 
@@ -102,6 +101,11 @@ var animate = function() {
     var ay = GRAVITY_ACC;
 
     craft.a = craft.a + craft.turn * 0.05;
+    if (craft.a >= Math.PI) {
+        craft.a -= 2*Math.PI;
+    } else if (craft.a < -Math.PI) {
+        craft.a += 2*Math.PI;
+    }
 
     if (craft.engineOn && craft.fuel > 0) {
         var acc = ENGINE_THRUST / (500 + craft.fuel);
@@ -138,8 +142,7 @@ var drawHud = function(ctx) {
 var draw = function() {
     var canvas = document.getElementById('canvas');
     var ctx = canvas.getContext('2d');
-    // ctx.fillStyle="rgb(255, 255, 255)"
-    // ctx.fillRect(0, 0, canvas.width, canvas.height);
+
     drawBackground(ctx);
 
     animate();
@@ -150,7 +153,7 @@ var draw = function() {
     if (craftCollide()) {
         if (craft.vy > MAX_VY 
             || Math.abs(craft.vx) > MAX_VX
-            || (craft.a / (2 * Math.PI)) > 0.1) {
+            || Math.abs(craft.a / (2 * Math.PI)) > 0.1) {
             drawTextCentered("CRASH!");
         } else {
             drawTextCentered("GOOD LANDING!");
